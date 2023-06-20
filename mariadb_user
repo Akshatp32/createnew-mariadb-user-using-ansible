@@ -1,0 +1,41 @@
+---
+- name: Create MariaDB User
+  hosts: all
+  become: yes
+
+  vars:
+    db_user: user1
+    db_password: user1
+    db_name: userdatabase
+
+  tasks:
+    - name: Install MySQL Python package
+      pip:
+        name: MySQL-python
+        state: present
+
+    - name: Create MariaDB User
+      community.mysql.mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        host: localhost
+        login_user: root
+        login_password: passwd
+        state: present
+
+    - name: Create MariaDB Database
+      community.mysql.mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        login_user: root
+        login_password: passwd
+
+    - name: Grant privileges to the user on the database
+      community.mysql.mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "{{ db_name }}.*:ALL"
+        host: localhost
+        login_user: root
+        login_password: passwd
+        state: present
